@@ -40,6 +40,18 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name='girl'
+        options={{
+          title: 'Girl',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon
+              name={focused ? 'woman' : 'woman-outline'}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name='tilt'
         options={{
           title: 'Tilt',
