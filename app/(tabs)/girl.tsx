@@ -1,9 +1,11 @@
 import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { Image, StyleSheet, Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
+import { Button, Image, StyleSheet, Text, View } from 'react-native';
 
 export default function Tilt() {
+  const router = useRouter();
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
@@ -18,6 +20,16 @@ export default function Tilt() {
     >
       <ThemedView>
         <ThemedText>Tilt Example Start!</ThemedText>
+
+        <Button
+          title='Go to Gyroscope'
+          onPress={() => router.push('/gyroscope')}
+        />
+        <Button
+          title='Go to Direction'
+          onPress={() => router.push('/direction')}
+        />
+
         <ThemedText>Tilt Example!</ThemedText>
         <ThemedText>Tilt Example!</ThemedText>
         <ThemedText>Tilt Example!</ThemedText>
