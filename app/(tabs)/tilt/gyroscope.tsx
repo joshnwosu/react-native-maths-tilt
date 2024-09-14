@@ -4,7 +4,7 @@ import { Accelerometer } from 'expo-sensors';
 import { useEffect, useState } from 'react';
 import { Animated, StyleSheet, Dimensions } from 'react-native';
 
-export default function Tilt() {
+export default function GyroscopeScreen() {
   const [xPosition, setXPosition] = useState(new Animated.Value(0));
   const [subscription, setSubscription] = useState<any>(null);
 

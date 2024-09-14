@@ -55,6 +55,7 @@ export default function TabLayout() {
         name='tilt'
         options={{
           title: 'Tilt',
+          headerShown: false,
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
               name={focused ? 'cube' : 'cube-outline'}

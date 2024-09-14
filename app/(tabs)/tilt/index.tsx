@@ -1,16 +1,20 @@
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Link } from 'expo-router';
-import { StyleSheet } from 'react-native';
+import { Pressable, StyleSheet } from 'react-native';
 
 export default function Tilt() {
   return (
     <ThemedView style={styles.container}>
-      <Link href='/tilt/gyroscope'>
-        <ThemedText>To to Tilt Gyroscope</ThemedText>
+      <Link href='/tilt/gyroscope' asChild>
+        <Pressable>
+          <ThemedText>To to Tilt Gyroscope</ThemedText>
+        </Pressable>
       </Link>
-      <Link href='/tilt/direction'>
-        <ThemedText>To to Tilt Direction</ThemedText>
+      <Link href='/tilt/direction' asChild>
+        <Pressable>
+          <ThemedText>To to Tilt Direction</ThemedText>
+        </Pressable>
       </Link>
     </ThemedView>
   );
