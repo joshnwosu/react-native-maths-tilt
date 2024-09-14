@@ -13,6 +13,7 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
+        tabBarShowLabel: false,
       }}
     >
       <Tabs.Screen
@@ -20,10 +21,7 @@ export default function TabLayout() {
         options={{
           title: 'Home',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon
-              name={focused ? 'home' : 'home-outline'}
-              color={color}
-            />
+            <TabBarIcon name={focused ? 'home' : 'home'} color={color} />
           ),
         }}
       />
@@ -32,10 +30,7 @@ export default function TabLayout() {
         options={{
           title: 'Explore',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon
-              name={focused ? 'code-slash' : 'code-slash-outline'}
-              color={color}
-            />
+            <TabBarIcon name={focused ? 'edit' : 'edit'} color={color} />
           ),
         }}
       />
@@ -44,10 +39,7 @@ export default function TabLayout() {
         options={{
           title: 'Girl',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon
-              name={focused ? 'woman' : 'woman-outline'}
-              color={color}
-            />
+            <TabBarIcon name={focused ? 'user' : 'user'} color={color} />
           ),
         }}
       />
@@ -58,7 +50,7 @@ export default function TabLayout() {
           headerShown: false,
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon
-              name={focused ? 'cube' : 'cube-outline'}
+              name={focused ? 'appstore-o' : 'appstore-o'}
               color={color}
             />
           ),
