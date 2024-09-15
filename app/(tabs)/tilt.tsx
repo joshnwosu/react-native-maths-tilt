@@ -8,12 +8,22 @@ export default function TiltScreen() {
     <ThemedView style={styles.container}>
       <Link href='/gyroscope' asChild>
         <Pressable>
-          <ThemedText>To to Tilt Gyroscope</ThemedText>
+          <ThemedText>Go to Tilt Gyroscope</ThemedText>
         </Pressable>
       </Link>
       <Link href='/direction' asChild>
         <Pressable>
-          <ThemedText>To to Tilt Direction</ThemedText>
+          <ThemedText>Go to Tilt Direction</ThemedText>
+        </Pressable>
+      </Link>
+      <Link href='/swipe' asChild>
+        <Pressable>
+          <ThemedText>Go to Tilt Swipe</ThemedText>
+        </Pressable>
+      </Link>
+      <Link href='/tap' asChild>
+        <Pressable>
+          <ThemedText>Go to Tilt Tap</ThemedText>
         </Pressable>
       </Link>
     </ThemedView>
