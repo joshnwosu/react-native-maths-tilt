@@ -2,7 +2,7 @@ import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useRouter } from 'expo-router';
-import { Button, Image, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 
 export default function Tilt() {
   const router = useRouter();
@@ -21,50 +21,31 @@ export default function Tilt() {
       <ThemedView>
         <ThemedText>Tilt Example Start!</ThemedText>
 
-        <Button
-          title='Go to Gyroscope'
-          onPress={() => router.push('/gyroscope')}
-        />
-        <Button
-          title='Go to Direction'
-          onPress={() => router.push('/direction')}
-        />
+        <View className='relative flex flex-col rounded-lg bg-white shadow-sm border border-slate-200 my-4'>
+          <View className='flex min-w-[240px] flex-col gap-1 p-1.5'>
+            <Pressable
+              onPress={() => console.log('Inbox')}
+              className='flex w-full items-center rounded-md p-3 transition-all hover:bg-slate-100 focus:bg-slate-100 active:bg-slate-100'
+            >
+              <Text className='text-slate-800'>Inbox</Text>
+            </Pressable>
 
-        <ThemedText>Tilt Example!</ThemedText>
-        <ThemedText>Tilt Example!</ThemedText>
-        <ThemedText>Tilt Example!</ThemedText>
-        <ThemedText>Tilt Example!</ThemedText>
-        <ThemedText>Tilt Example!</ThemedText>
-        <ThemedText>Tilt Example!</ThemedText>
-        <ThemedText>Tilt Example!</ThemedText>
-        <ThemedText>Tilt Example!</ThemedText>
-        <ThemedText>Tilt Example!</ThemedText>
-        <ThemedText>Tilt Example!</ThemedText>
-        <ThemedText>Tilt Example!</ThemedText>
-        <ThemedText>Tilt Example!</ThemedText>
-        <ThemedText>Tilt Example!</ThemedText>
-        <ThemedText>Tilt Example!</ThemedText>
-        <ThemedText>Tilt Example!</ThemedText>
-        <ThemedText>Tilt Example!</ThemedText>
-        <ThemedText>Tilt Example!</ThemedText>
-        <ThemedText>Tilt Example!</ThemedText>
-        <ThemedText>Tilt Example!</ThemedText>
-        <ThemedText>Tilt Example!</ThemedText>
-        <ThemedText>Tilt Example!</ThemedText>
-        <ThemedText>Tilt Example!</ThemedText>
-        <ThemedText>Tilt Example!</ThemedText>
-        <ThemedText>Tilt Example!</ThemedText>
-        <ThemedText>Tilt Example!</ThemedText>
-        <ThemedText>Tilt Example!</ThemedText>
-        <ThemedText>Tilt Example!</ThemedText>
-        <ThemedText>Tilt Example!</ThemedText>
-        <ThemedText>Tilt Example!</ThemedText>
-        <ThemedText>Tilt Example!</ThemedText>
-        <ThemedText>Tilt Example!</ThemedText>
-        <ThemedText>Tilt Example!</ThemedText>
-        <ThemedText>Tilt Example!</ThemedText>
-        <ThemedText>Tilt Example!</ThemedText>
-        <ThemedText>Tilt Example!</ThemedText>
+            <Pressable
+              onPress={() => console.log('Trash')}
+              className=' flex w-full items-center rounded-md p-3 transition-all hover:bg-slate-100 focus:bg-slate-100 active:bg-red-50'
+            >
+              <Text className='text-red-600'>Trash</Text>
+            </Pressable>
+
+            <Pressable
+              onPress={() => console.log('Settings')}
+              className='flex w-full items-center rounded-md p-3 transition-all hover:bg-slate-100 focus:bg-slate-100 active:bg-slate-100'
+            >
+              <Text className='text-slate-800'>Settings</Text>
+            </Pressable>
+          </View>
+        </View>
+
         <ThemedText>Tilt Example!</ThemedText>
         <ThemedText>Tilt Example!</ThemedText>
         <ThemedText>Tilt Example!</ThemedText>
