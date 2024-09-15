@@ -6,6 +6,9 @@ import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 
 export default function Tilt() {
   const router = useRouter();
+
+  const options = ['Inbox', 'Trash', 'Settings'];
+
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
@@ -21,29 +24,24 @@ export default function Tilt() {
       <ThemedView>
         <ThemedText>Tilt Example Start!</ThemedText>
 
-        <View className='relative flex flex-col rounded-lg bg-white shadow-sm border border-slate-200 my-4'>
-          <View className='flex min-w-[240px] flex-col gap-1 p-1.5'>
+        <View className='relative flex flex-col rounded-lg bg-white shadow-sm border border-slate-200 my-4 py-4'>
+          {options.map((item, index) => (
             <Pressable
-              onPress={() => console.log('Inbox')}
-              className='flex w-full items-center rounded-md p-3 transition-all hover:bg-slate-100 focus:bg-slate-100 active:bg-slate-100'
+              key={index.toString()}
+              onPress={() => console.log(item)}
+              className={`flex w-full items-center rounded-md p-3 transition-all hover:bg-slate-100 focus:bg-slate-100 active:${
+                item === 'Trash' ? 'bg-red-50' : 'bg-slate-100'
+              }`}
             >
-              <Text className='text-slate-800'>Inbox</Text>
+              <Text
+                className={`${
+                  item === 'Trash' ? 'text-red-600' : 'text-slate-800'
+                }`}
+              >
+                {item}
+              </Text>
             </Pressable>
-
-            <Pressable
-              onPress={() => console.log('Trash')}
-              className=' flex w-full items-center rounded-md p-3 transition-all hover:bg-slate-100 focus:bg-slate-100 active:bg-red-50'
-            >
-              <Text className='text-red-600'>Trash</Text>
-            </Pressable>
-
-            <Pressable
-              onPress={() => console.log('Settings')}
-              className='flex w-full items-center rounded-md p-3 transition-all hover:bg-slate-100 focus:bg-slate-100 active:bg-slate-100'
-            >
-              <Text className='text-slate-800'>Settings</Text>
-            </Pressable>
-          </View>
+          ))}
         </View>
 
         <ThemedText>Tilt Example!</ThemedText>
