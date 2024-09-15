@@ -1,31 +1,31 @@
+import Card from '@/components/Shared/Card/Card';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Link } from 'expo-router';
 import { Pressable, StyleSheet } from 'react-native';
 
 export default function TiltScreen() {
+  const options = [
+    { name: 'Gyroscope', link: '/gyroscope' },
+    { name: 'Direction', link: '/direction' },
+    { name: 'Swipe', link: '/swipe' },
+    { name: 'Tap', link: '/tap' },
+  ];
   return (
     <ThemedView style={styles.container}>
-      <Link href='/gyroscope' asChild>
-        <Pressable>
-          <ThemedText>Go to Tilt Gyroscope</ThemedText>
-        </Pressable>
-      </Link>
-      <Link href='/direction' asChild>
-        <Pressable>
-          <ThemedText>Go to Tilt Direction</ThemedText>
-        </Pressable>
-      </Link>
-      <Link href='/swipe' asChild>
-        <Pressable>
-          <ThemedText>Go to Tilt Swipe</ThemedText>
-        </Pressable>
-      </Link>
-      <Link href='/tap' asChild>
-        <Pressable>
-          <ThemedText>Go to Tilt Tap</ThemedText>
-        </Pressable>
-      </Link>
+      <ThemedText>Tilt Examples:</ThemedText>
+      <Card>
+        {options.map((item, index) => (
+          <Link key={index.toString()} href={item.link as any} asChild>
+            <Pressable
+              onPress={() => console.log(item)}
+              className='text-slate-800 flex w-full items-center rounded-md p-3 transition-all hover:bg-slate-100 focus:bg-slate-100 active:bg-slate-100'
+            >
+              <ThemedText>{item.name}</ThemedText>
+            </Pressable>
+          </Link>
+        ))}
+      </Card>
     </ThemedView>
   );
 }
@@ -35,5 +35,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 20,
   },
 });

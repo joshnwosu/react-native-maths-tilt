@@ -1,13 +1,11 @@
 import ParallaxScrollView from '@/components/ParallaxScrollView';
+import Card from '@/components/Shared/Card/Card';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { useRouter } from 'expo-router';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text } from 'react-native';
 
 export default function Tilt() {
-  const router = useRouter();
-
-  const options = ['Inbox', 'Trash', 'Settings'];
+  const options = ['Inbox', 'Folders', 'Notifications', 'Settings', 'Trash'];
 
   return (
     <ParallaxScrollView
@@ -24,25 +22,17 @@ export default function Tilt() {
       <ThemedView>
         <ThemedText>Tilt Example Start!</ThemedText>
 
-        <View className='relative flex flex-col rounded-lg bg-white shadow-sm border border-slate-200 my-4 py-4'>
+        <Card>
           {options.map((item, index) => (
             <Pressable
               key={index.toString()}
               onPress={() => console.log(item)}
-              className={`flex w-full items-center rounded-md p-3 transition-all hover:bg-slate-100 focus:bg-slate-100 active:${
-                item === 'Trash' ? 'bg-red-50' : 'bg-slate-100'
-              }`}
+              className='text-slate-800 flex w-full items-center rounded-md p-3 transition-all hover:bg-slate-100 focus:bg-slate-100 active:bg-slate-100'
             >
-              <Text
-                className={`${
-                  item === 'Trash' ? 'text-red-600' : 'text-slate-800'
-                }`}
-              >
-                {item}
-              </Text>
+              <ThemedText>{item}</ThemedText>
             </Pressable>
           ))}
-        </View>
+        </Card>
 
         <ThemedText>Tilt Example!</ThemedText>
         <ThemedText>Tilt Example!</ThemedText>
