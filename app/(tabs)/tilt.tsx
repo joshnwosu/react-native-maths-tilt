@@ -19,9 +19,9 @@ export default function TiltScreen() {
           <Link key={index.toString()} href={item.link as any} asChild>
             <Pressable
               onPress={() => console.log(item)}
-              className='text-slate-800 flex w-full items-center rounded-md p-3 transition-all hover:bg-slate-100 focus:bg-slate-100 active:bg-slate-100'
+              className='flex w-full items-center rounded-md p-3 transition-all hover:bg-slate-100 focus:bg-slate-100 active:bg-slate-600'
             >
-              <ThemedText>{item.name}</ThemedText>
+              <ThemedText type='subtitle'>{item.name}</ThemedText>
             </Pressable>
           </Link>
         ))}
