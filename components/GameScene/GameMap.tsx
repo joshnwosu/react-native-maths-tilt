@@ -1,7 +1,8 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 import { createGrid, generateMaze, getMazeRoadBlocks } from './util';
+import { ThemedText } from '../ThemedText';
 
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
@@ -40,13 +41,10 @@ const GameMap: React.FC = () => {
 
   const [roadBlocks, setRoadBlocks] = useState<{ x: number; y: number }[]>([]);
   const [moves, setMoves] = useState(0);
-  const [dotMoved, setDotMoved] = useState(false); // Track if the dot has moved
-
-  const moveIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const resetGame = () => {
     setMoves(0);
-    setDotMoved(false); // Reset the moved state
+
     const width = mazeGridSize;
     const height = mazeGridSize;
     const grid = createGrid(width, height);
@@ -134,7 +132,6 @@ const GameMap: React.FC = () => {
       } else {
         setRedDotPosition(newPosition);
         setMoves((prevScore) => prevScore + 1);
-        setDotMoved(true); // Mark that the dot has moved
       }
     }
   };
@@ -187,6 +184,8 @@ const GameMap: React.FC = () => {
           ]}
         />
       </View>
+
+      <ThemedText>MOVES: {moves}</ThemedText>
 
       {/* Controls */}
 
