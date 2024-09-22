@@ -1,13 +1,20 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Dimensions,
+  TouchableOpacity,
+  Image,
+  ImageBackground,
+} from 'react-native';
 import { createGrid, generateMaze, getMazeRoadBlocks } from './util';
 import { ThemedText } from '../ThemedText';
 
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
 
-const mazeGridSize = 7; // Odd numbers for better maze generation - please do not go below 7
+const mazeGridSize = 29; // Odd numbers for better maze generation - please do not go below 7
 const blockSize = screenWidth / mazeGridSize; // Define block size for road and movement
 const mazeContainerHeight = blockSize * mazeGridSize;
 const minDistance = 200; // Minimum distance between red and blue dots
@@ -138,52 +145,63 @@ const GameMap: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      {/* Maze (Road) */}
-      <View style={styles.mazeContainer}>
-        {roadBlocks.map((block, index) => {
-          const isHighlighted = isCurrentBlock(block, redDotPosition);
+      <ImageBackground
+        source={require('@/assets/images/bg/grass1.jpg')}
+        style={{
+          width: '100%',
+          height: mazeContainerHeight,
+          marginBottom: blockSize / 2,
+        }}
+        resizeMode='cover'
+      >
+        {/* Maze (Road) */}
+        <View style={styles.mazeContainer}>
+          {roadBlocks.map((block, index) => {
+            const isHighlighted = isCurrentBlock(block, redDotPosition);
 
-          return (
-            <View
-              key={index}
-              style={[
-                styles.roadBlock,
-                {
-                  left: block.x,
-                  top: block.y,
-                  width: blockSize,
-                  height: blockSize,
-                },
-                isHighlighted ? styles.highlightedBlock : {},
-              ]}
-            />
-          );
-        })}
+            return (
+              <View
+                key={index}
+                style={[
+                  styles.roadBlock,
+                  {
+                    left: block.x,
+                    top: block.y,
+                    width: blockSize,
+                    height: blockSize,
+                    transform: [{ scale: 1.5 }],
+                  },
+                  isHighlighted ? styles.highlightedBlock : {},
+                ]}
+              />
+            );
+          })}
 
-        {/* (Red Dot) */}
-        <View
-          style={[
-            styles.dot,
-            {
-              left: redDotPosition.x,
-              top: redDotPosition.y,
-              backgroundColor: 'red',
-            },
-          ]}
-        />
+          {/* (Red Dot) */}
+          <View
+            style={[
+              styles.dot,
+              {
+                left: redDotPosition.x,
+                top: redDotPosition.y,
+                backgroundColor: 'orangered',
+              },
+            ]}
+          />
 
-        {/* (Blue Dot) */}
-        <View
-          style={[
-            styles.dot,
-            {
-              left: blueDotPosition.x,
-              top: blueDotPosition.y,
-              backgroundColor: 'blue',
-            },
-          ]}
-        />
-      </View>
+          {/* (Blue Dot) */}
+          <View
+            style={[
+              styles.dot,
+              {
+                left: blueDotPosition.x,
+                top: blueDotPosition.y,
+                backgroundColor: 'skyblue',
+              },
+            ]}
+          />
+        </View>
+      </ImageBackground>
 
       <ThemedText>MOVES: {moves}</ThemedText>
 
@@ -229,12 +247,11 @@ const styles = StyleSheet.create({
     position: 'relative',
     width: screenWidth,
     height: mazeContainerHeight,
-    // backgroundColor: '#b0c4de',
   },
   roadBlock: {
     position: 'absolute',
-    backgroundColor: '#333',
-    // backgroundColor: '#4CAF50',
+    backgroundColor: '#111',
+    borderRadius: 5,
   },
   highlightedBlock: {},
   dot: {
@@ -243,6 +260,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     padding: 1,
     backgroundColor: 'white',
+    borderRadius: blockSize,
   },
   boxcontainer: {
     width: 150,
