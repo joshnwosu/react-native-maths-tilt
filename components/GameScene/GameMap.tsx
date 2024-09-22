@@ -1,44 +1,76 @@
 import { Ionicons } from '@expo/vector-icons';
 import React, { useRef, useState, useEffect } from 'react';
-import {
-  View,
-  StyleSheet,
-  Dimensions,
-  TouchableOpacity,
-  Animated,
-} from 'react-native';
+import { View, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 import { createGrid, generateMaze, getMazeRoadBlocks } from './util';
 
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
 
-const blockSize = screenWidth / 20; // Define block size for road and movement
+const mazeGridSize = 7; // Odd numbers for better maze generation - please do not go below 7
+const blockSize = screenWidth / mazeGridSize; // Define block size for road and movement
+const mazeContainerHeight = blockSize * mazeGridSize;
+const minDistance = 200; // Minimum distance between red and blue dots
+
+// Helper function to calculate distance
+const calculateDistance = (
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number
+): number => {
+  return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+};
+
+// Function to get a random position from the road blocks
+const getRandomRoadBlock = (roadBlocks: { x: number; y: number }[]) => {
+  const randomIndex = Math.floor(Math.random() * roadBlocks.length);
+  return roadBlocks[randomIndex];
+};
 
 const GameMap: React.FC = () => {
   // Initial car position inside the maze (centered within the grid)
-  const [carPosition, setCarPosition] = useState({
-    x: blockSize * 0,
-    y: blockSize * 0,
+  const [redDotPosition, setRedDotPosition] = useState({
+    x: blockSize * 1,
+    y: blockSize * 1,
+  });
+  const [blueDotPosition, setBlueDotPosition] = useState({
+    x: 0,
+    y: 0,
   });
 
-  const carSpeed = blockSize; // Car moves by one block size at a time
-
-  // Use Animated values for smooth animation
-  const translateX = useRef(new Animated.Value(carPosition.x)).current;
-  const translateY = useRef(new Animated.Value(carPosition.y)).current;
-
   const [roadBlocks, setRoadBlocks] = useState<{ x: number; y: number }[]>([]);
+  const [moves, setMoves] = useState(0);
+  const [dotMoved, setDotMoved] = useState(false); // Track if the dot has moved
 
-  useEffect(() => {
-    const width = 19; // Odd numbers for better maze generation
-    const height = 19; // Odd numbers work best for carving paths
+  const moveIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const resetGame = () => {
+    setMoves(0);
+    setDotMoved(false); // Reset the moved state
+    const width = mazeGridSize;
+    const height = mazeGridSize;
     const grid = createGrid(width, height);
 
-    // Start maze generation at (1, 1) for paths to work properly
-    generateMaze(grid, 0, 0);
+    generateMaze(grid, 1, 1);
     const roadPath = getMazeRoadBlocks(grid, blockSize);
     setRoadBlocks(roadPath);
-    // console.log('path: ', generateMaze(grid, 0, 0));
+
+    // Place the red dot randomly within the road blocks
+    const redDot = getRandomRoadBlock(roadPath);
+    setRedDotPosition(redDot);
+
+    // Place the blue dot far away from the red dot within the road blocks
+    let blueDot = getRandomRoadBlock(roadPath);
+    while (
+      calculateDistance(redDot.x, redDot.y, blueDot.x, blueDot.y) < minDistance
+    ) {
+      blueDot = getRandomRoadBlock(roadPath); // Keep re-rolling until far enough
+    }
+    setBlueDotPosition(blueDot);
+  };
+
+  useEffect(() => {
+    resetGame();
   }, []);
 
   // Function to check if the new position is within the road blocks
@@ -55,7 +87,6 @@ const GameMap: React.FC = () => {
     block: { x: number; y: number },
     carPos: { x: number; y: number }
   ) => {
-    // Round the coordinates to avoid floating-point precision issues
     const roundedBlockX = Math.round(block.x / blockSize) * blockSize;
     const roundedBlockY = Math.round(block.y / blockSize) * blockSize;
     const roundedCarX = Math.round(carPos.x / blockSize) * blockSize;
@@ -64,43 +95,47 @@ const GameMap: React.FC = () => {
     return roundedBlockX === roundedCarX && roundedBlockY === roundedCarY;
   };
 
-  // Function to animate the car's movement
-  const animateCar = (newX: number, newY: number) => {
-    Animated.timing(translateX, {
-      toValue: newX,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
+  // Function to check if red and blue dots are on the same block
+  const checkCollision = (newPosition: { x: number; y: number }) => {
+    const redX = Math.round(newPosition.x / blockSize) * blockSize;
+    const redY = Math.round(newPosition.y / blockSize) * blockSize;
+    const blueX = Math.round(blueDotPosition.x / blockSize) * blockSize;
+    const blueY = Math.round(blueDotPosition.y / blockSize) * blockSize;
 
-    Animated.timing(translateY, {
-      toValue: newY,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
+    return redX === blueX && redY === blueY;
   };
 
-  const moveCar = (direction: string) => {
-    let newX = carPosition.x;
-    let newY = carPosition.y;
+  const moveDot = (direction: string) => {
+    let newX = redDotPosition.x;
+    let newY = redDotPosition.y;
 
     switch (direction) {
       case 'left':
-        newX = carPosition.x - carSpeed;
+        newX -= blockSize;
         break;
       case 'right':
-        newX = carPosition.x + carSpeed;
+        newX += blockSize;
         break;
       case 'up':
-        newY = carPosition.y - carSpeed;
+        newY -= blockSize;
         break;
       case 'down':
-        newY = carPosition.y + carSpeed;
+        newY += blockSize;
         break;
     }
 
     if (isWithinRoad(newX, newY)) {
-      setCarPosition({ x: newX, y: newY });
-      animateCar(newX, newY);
+      const newPosition = { x: newX, y: newY };
+
+      // Check collision before updating the position
+      if (checkCollision(newPosition)) {
+        alert(`Game Over! Final Score: ${moves + 1}`);
+        resetGame(); // Reset immediately on collision
+      } else {
+        setRedDotPosition(newPosition);
+        setMoves((prevScore) => prevScore + 1);
+        setDotMoved(true); // Mark that the dot has moved
+      }
     }
   };
 
@@ -109,7 +144,7 @@ const GameMap: React.FC = () => {
       {/* Maze (Road) */}
       <View style={styles.mazeContainer}>
         {roadBlocks.map((block, index) => {
-          const isHighlighted = isCurrentBlock(block, carPosition);
+          const isHighlighted = isCurrentBlock(block, redDotPosition);
 
           return (
             <View
@@ -128,44 +163,55 @@ const GameMap: React.FC = () => {
           );
         })}
 
-        {/* Car (Red Dot) */}
-        <Animated.View
+        {/* (Red Dot) */}
+        <View
           style={[
-            styles.car,
+            styles.dot,
             {
-              transform: [{ translateX }, { translateY }],
-              top: blockSize / 4,
-              left: blockSize / 4,
-              width: blockSize / 2,
-              height: blockSize / 2,
+              left: redDotPosition.x,
+              top: redDotPosition.y,
+              backgroundColor: 'red',
+            },
+          ]}
+        />
+
+        {/* (Blue Dot) */}
+        <View
+          style={[
+            styles.dot,
+            {
+              left: blueDotPosition.x,
+              top: blueDotPosition.y,
+              backgroundColor: 'blue',
             },
           ]}
         />
       </View>
 
       {/* Controls */}
+
       <View style={styles.boxcontainer}>
         <TouchableOpacity
           style={[styles.box, styles.topCenter]}
-          onPress={() => moveCar('up')}
+          onPress={() => moveDot('up')}
         >
           <Ionicons name='arrow-up-outline' size={30} color={'#ffffff'} />
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.box, styles.leftCenter]}
-          onPress={() => moveCar('left')}
+          onPress={() => moveDot('left')}
         >
           <Ionicons name='arrow-back-outline' size={30} color={'#ffffff'} />
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.box, styles.bottomCenter]}
-          onPress={() => moveCar('down')}
+          onPress={() => moveDot('down')}
         >
           <Ionicons name='arrow-down-outline' size={30} color={'#ffffff'} />
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.box, styles.rightCenter]}
-          onPress={() => moveCar('right')}
+          onPress={() => moveDot('right')}
         >
           <Ionicons name='arrow-forward-outline' size={30} color={'#ffffff'} />
         </TouchableOpacity>
@@ -177,35 +223,37 @@ const GameMap: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#e0e0e0',
+    // backgroundColor: '#e0e0e0',
     alignItems: 'center',
   },
   mazeContainer: {
     position: 'relative',
     width: screenWidth,
-    height: screenHeight / 2,
-    backgroundColor: '#b0c4de',
+    height: mazeContainerHeight,
+    // backgroundColor: '#b0c4de',
   },
   roadBlock: {
     position: 'absolute',
     backgroundColor: '#333',
-    borderWidth: 1,
-    borderColor: '#b0c4de',
+    // backgroundColor: '#4CAF50',
   },
-  highlightedBlock: {
-    // backgroundColor: '#ffffff',
-  },
-  car: {
+  highlightedBlock: {},
+  dot: {
+    width: blockSize,
+    aspectRatio: 1,
     position: 'absolute',
-    backgroundColor: 'red',
-    borderRadius: blockSize / 4, // Adjusted for better visuals
+    padding: 1,
+    backgroundColor: 'white',
   },
   boxcontainer: {
-    width: 200,
+    width: 150,
     aspectRatio: 1,
     position: 'absolute',
     bottom: 10,
     left: 10,
+
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   box: {
     width: '33.33%',
@@ -217,23 +265,15 @@ const styles = StyleSheet.create({
   },
   topCenter: {
     top: 0,
-    left: '50%',
-    transform: [{ translateX: -33.33 }],
   },
   leftCenter: {
-    top: '50%',
     left: 0,
-    transform: [{ translateY: -33.33 }],
   },
   bottomCenter: {
     bottom: 0,
-    left: '50%',
-    transform: [{ translateX: -33.33 }],
   },
   rightCenter: {
-    top: '50%',
     right: 0,
-    transform: [{ translateY: -33.33 }],
   },
 });
 
