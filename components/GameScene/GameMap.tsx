@@ -14,7 +14,7 @@ import { ThemedText } from '../ThemedText';
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
 
-const mazeGridSize = 29; // Odd numbers for better maze generation - please do not go below 7
+const mazeGridSize = 11; // Odd numbers for better maze generation - please do not go below 7
 const blockSize = screenWidth / mazeGridSize; // Define block size for road and movement
 const mazeContainerHeight = blockSize * mazeGridSize;
 const minDistance = 200; // Minimum distance between red and blue dots
