@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
   StyleSheet,
@@ -48,39 +48,38 @@ const GameMap: React.FC = () => {
     y: 0,
   });
 
-  const [roadBlocks, setRoadBlocks] = useState<{ x: number; y: number }[]>([]);
+  // const [roadBlocks, setRoadBlocks] = useState<{ x: number; y: number }[]>([]);
   const [moves, setMoves] = useState(0);
 
   const [isModalVisible, setModalVisible] = useState(false);
 
-  const resetGame = () => {
-    setMoves(0);
-
+  const roadBlocks = useMemo(() => {
     const width = mazeGridSize;
     const height = mazeGridSize;
     const grid = createGrid(width, height);
-
     generateMaze(grid, 1, 1);
-    const roadPath = getMazeRoadBlocks(grid, blockSize);
-    setRoadBlocks(roadPath);
+    return getMazeRoadBlocks(grid, blockSize);
+  }, []);
 
-    // Place the red dot randomly within the road blocks
-    const redDot = getRandomRoadBlock(roadPath);
+  const resetGame = () => {
+    setMoves(0);
+
+    // Recalculate road blocks if needed, but otherwise use the memoized value
+    const redDot = getRandomRoadBlock(roadBlocks);
     setRedDotPosition(redDot);
 
-    // Place the blue dot far away from the red dot within the road blocks
-    let blueDot = getRandomRoadBlock(roadPath);
+    let blueDot = getRandomRoadBlock(roadBlocks);
     while (
       calculateDistance(redDot.x, redDot.y, blueDot.x, blueDot.y) < minDistance
     ) {
-      blueDot = getRandomRoadBlock(roadPath); // Keep re-rolling until far enough
+      blueDot = getRandomRoadBlock(roadBlocks); // Keep re-rolling until far enough
     }
     setBlueDotPosition(blueDot);
   };
 
   useEffect(() => {
     resetGame();
-  }, []);
+  }, [roadBlocks]);
 
   // Function to check if the new position is within the road blocks
   const isWithinRoad = (newX: number, newY: number): boolean => {
@@ -114,39 +113,40 @@ const GameMap: React.FC = () => {
     return redX === blueX && redY === blueY;
   };
 
-  const moveDot = async (direction: string) => {
-    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+  const moveDot = useCallback(
+    async (direction: string) => {
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
-    let newX = redDotPosition.x;
-    let newY = redDotPosition.y;
+      let newX = redDotPosition.x;
+      let newY = redDotPosition.y;
 
-    switch (direction) {
-      case 'left':
-        newX -= blockSize;
-        break;
-      case 'right':
-        newX += blockSize;
-        break;
-      case 'up':
-        newY -= blockSize;
-        break;
-      case 'down':
-        newY += blockSize;
-        break;
-    }
-
-    if (isWithinRoad(newX, newY)) {
-      const newPosition = { x: newX, y: newY };
-
-      setRedDotPosition(newPosition);
-      setMoves((prevScore) => prevScore + 1);
-
-      // Check collision before updating the position
-      if (checkCollision(newPosition)) {
-        setModalVisible(true);
+      switch (direction) {
+        case 'left':
+          newX -= blockSize;
+          break;
+        case 'right':
+          newX += blockSize;
+          break;
+        case 'up':
+          newY -= blockSize;
+          break;
+        case 'down':
+          newY += blockSize;
+          break;
       }
-    }
-  };
+
+      if (isWithinRoad(newX, newY)) {
+        const newPosition = { x: newX, y: newY };
+        setRedDotPosition(newPosition);
+        setMoves((prevMoves) => prevMoves + 1);
+
+        if (checkCollision(newPosition)) {
+          setModalVisible(true);
+        }
+      }
+    },
+    [redDotPosition, isWithinRoad]
+  );
 
   const handleCloseModal = () => {
     setModalVisible(false);
@@ -156,11 +156,12 @@ const GameMap: React.FC = () => {
   return (
     <View style={styles.container}>
       <ImageBackground
-        source={require('@/assets/images/bg/grass.jpg')}
+        source={require('@/assets/images/bg/sand.jpg')}
         style={{
           width: '100%',
           // height: screenHeight,
           marginBottom: blockSize / 2,
+          backgroundColor: 'skyblue',
         }}
         resizeMode='cover'
       >
@@ -187,7 +188,6 @@ const GameMap: React.FC = () => {
             );
           })}
 
-          {/* (Red Dot) */}
           <View
             style={[
               styles.dot,
@@ -200,7 +200,6 @@ const GameMap: React.FC = () => {
             ]}
           />
 
-          {/* (Blue Dot) */}
           <View
             style={[
               styles.dot,
@@ -215,9 +214,8 @@ const GameMap: React.FC = () => {
             ]}
           />
         </View>
-
-        <ThemedText style={styles.movesCount}>MOVES: {moves}</ThemedText>
       </ImageBackground>
+      <ThemedText style={styles.movesCount}>MOVES: {moves}</ThemedText>
 
       {/* Controls */}
 
@@ -279,7 +277,7 @@ const styles = StyleSheet.create({
   roadBlock: {
     position: 'absolute',
     backgroundColor: '#111',
-    borderRadius: 5,
+    // borderRadius: 5,
   },
   highlightedBlock: {},
   dot: {
