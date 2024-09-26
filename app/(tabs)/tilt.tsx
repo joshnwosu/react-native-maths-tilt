@@ -11,6 +11,7 @@ export default function TiltScreen() {
     { name: 'Swipe', link: '/swipe' },
     { name: 'Tap', link: '/tap' },
     { name: 'Z-Game', link: '/zGame' },
+    { name: 'Car Race', link: '/carrace' },
   ];
   return (
     <ThemedView style={styles.container}>

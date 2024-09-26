@@ -10,11 +10,13 @@ import {
 } from 'react-native';
 import { createGrid, generateMaze, getMazeRoadBlocks } from './util';
 import { ThemedText } from '../ThemedText';
+import PopupModal from '../PopupModal/PopupModal';
+import * as Haptics from 'expo-haptics';
 
 const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
 
-const mazeGridSize = 11; // Odd numbers for better maze generation - please do not go below 7
+const mazeGridSize = 19; // Odd numbers for better maze generation - please do not go below 7
 const blockSize = screenWidth / mazeGridSize; // Define block size for road and movement
 const mazeContainerHeight = blockSize * mazeGridSize;
 const minDistance = 200; // Minimum distance between red and blue dots
@@ -48,6 +50,8 @@ const GameMap: React.FC = () => {
 
   const [roadBlocks, setRoadBlocks] = useState<{ x: number; y: number }[]>([]);
   const [moves, setMoves] = useState(0);
+
+  const [isModalVisible, setModalVisible] = useState(false);
 
   const resetGame = () => {
     setMoves(0);
@@ -110,7 +114,9 @@ const GameMap: React.FC = () => {
     return redX === blueX && redY === blueY;
   };
 
-  const moveDot = (direction: string) => {
+  const moveDot = async (direction: string) => {
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+
     let newX = redDotPosition.x;
     let newY = redDotPosition.y;
 
@@ -132,24 +138,28 @@ const GameMap: React.FC = () => {
     if (isWithinRoad(newX, newY)) {
       const newPosition = { x: newX, y: newY };
 
+      setRedDotPosition(newPosition);
+      setMoves((prevScore) => prevScore + 1);
+
       // Check collision before updating the position
       if (checkCollision(newPosition)) {
-        alert(`Game Over! Final Score: ${moves + 1}`);
-        resetGame(); // Reset immediately on collision
-      } else {
-        setRedDotPosition(newPosition);
-        setMoves((prevScore) => prevScore + 1);
+        setModalVisible(true);
       }
     }
+  };
+
+  const handleCloseModal = () => {
+    setModalVisible(false);
+    resetGame(); // Reset immediately on collision
   };
 
   return (
     <View style={styles.container}>
       <ImageBackground
-        source={require('@/assets/images/bg/grass1.jpg')}
+        source={require('@/assets/images/bg/grass.jpg')}
         style={{
           width: '100%',
-          height: mazeContainerHeight,
+          // height: screenHeight,
           marginBottom: blockSize / 2,
         }}
         resizeMode='cover'
@@ -185,6 +195,7 @@ const GameMap: React.FC = () => {
                 left: redDotPosition.x,
                 top: redDotPosition.y,
                 backgroundColor: 'orangered',
+                zIndex: 2,
               },
             ]}
           />
@@ -196,14 +207,17 @@ const GameMap: React.FC = () => {
               {
                 left: blueDotPosition.x,
                 top: blueDotPosition.y,
-                backgroundColor: 'skyblue',
+                backgroundColor: 'transparent',
+                zIndex: 1,
+                borderWidth: 2,
+                borderColor: 'skyblue',
               },
             ]}
           />
         </View>
-      </ImageBackground>
 
-      <ThemedText>MOVES: {moves}</ThemedText>
+        <ThemedText style={styles.movesCount}>MOVES: {moves}</ThemedText>
+      </ImageBackground>
 
       {/* Controls */}
 
@@ -212,27 +226,37 @@ const GameMap: React.FC = () => {
           style={[styles.box, styles.topCenter]}
           onPress={() => moveDot('up')}
         >
-          <Ionicons name='arrow-up-outline' size={30} color={'#ffffff'} />
+          <Ionicons name='arrow-up-outline' size={20} color={'#ffffff'} />
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.box, styles.leftCenter]}
           onPress={() => moveDot('left')}
         >
-          <Ionicons name='arrow-back-outline' size={30} color={'#ffffff'} />
+          <Ionicons name='arrow-back-outline' size={20} color={'#ffffff'} />
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.box, styles.bottomCenter]}
           onPress={() => moveDot('down')}
         >
-          <Ionicons name='arrow-down-outline' size={30} color={'#ffffff'} />
+          <Ionicons name='arrow-down-outline' size={20} color={'#ffffff'} />
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.box, styles.rightCenter]}
           onPress={() => moveDot('right')}
         >
-          <Ionicons name='arrow-forward-outline' size={30} color={'#ffffff'} />
+          <Ionicons name='arrow-forward-outline' size={20} color={'#ffffff'} />
         </TouchableOpacity>
       </View>
+
+      {/* Modal */}
+
+      <PopupModal
+        visible={isModalVisible}
+        onClose={handleCloseModal}
+        title='Game Over!'
+      >
+        <ThemedText>Total Moves: {moves}</ThemedText>
+      </PopupModal>
     </View>
   );
 };
@@ -242,6 +266,10 @@ const styles = StyleSheet.create({
     flex: 1,
     // backgroundColor: '#e0e0e0',
     alignItems: 'center',
+  },
+  movesCount: {
+    textAlign: 'center',
+    marginBottom: blockSize / 2,
   },
   mazeContainer: {
     position: 'relative',
@@ -275,7 +303,7 @@ const styles = StyleSheet.create({
   box: {
     width: '33.33%',
     height: '33.33%',
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#111',
     position: 'absolute',
     justifyContent: 'center',
     alignItems: 'center',
@@ -295,3 +323,5 @@ const styles = StyleSheet.create({
 });
 
 export default GameMap;
+
+// !TODO: Users should be able to move the red dot with their hand by dragging it left, right, up or down.
