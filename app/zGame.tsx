@@ -1,7 +1,18 @@
-import { View, Text } from 'react-native';
 import React from 'react';
 import GameMap from '@/components/GameScene/GameMap';
+import { GameBoard } from '@/components/SnakeGame/GameBoard';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 export default function zGame() {
-  return <GameMap />;
+  return (
+    <>
+      {!true ? (
+        <GameMap />
+      ) : (
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <GameBoard />
+        </GestureHandlerRootView>
+      )}
+    </>
+  );
 }
